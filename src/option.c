@@ -62,6 +62,7 @@ static struct option cmd_options[] = {
     {"port",      required_argument, 0, 'p'},
 
     {"config",    required_argument, 0, 'c'},
+    {"noconfig",  no_argument,       0, 'n'},
     {"function",  required_argument, 0, 'f'},
     {0, 0, 0, 0}
 };
@@ -149,20 +150,26 @@ bool parse_config(int argc, char *argv[]) {
                 jsonconfig.file = optarg;
                 break;
 
+            case 'n':
+                jsonconfig.file = NULL;
+                jsonconfig.is_used = false;
+                break;
+                
             case 'f':
                 jsonconfig.function = optarg;
                 break;
         }
     }
 
-    if (jsonconfig.file == NULL) {
+    if (jsonconfig.file == NULL && jsonconfig.is_used) {
         jsonconfig.file = jsonconfig.defaultfile;
     }
 
     LOG__DEBUG("default json file:%s   file given:%s   function:%s\n", jsonconfig.defaultfile, jsonconfig.file, jsonconfig.function);
 
     if (jsonconfig.function == NULL) {
-        if ((strcmp(prognames.mav_repeater, progname) == 0) || (strcmp(prognames.mav_repeater_client, progname) == 0) || (strcmp(prognames.mav_repeater_server, progname) == 0)) {
+        if ((strcmp(prognames.mav_repeater, progname) == 0) || (strcmp(prognames.mav_repeater_client, progname) == 0) ||
+                (strcmp(prognames.mav_repeater_server, progname) == 0) || (strcmp(prognames.mav_console, progname) == 0)) {
             LOG__DEBUG("search %s in json config", progname);
             jsonconfig.function = progname;
         } else {
@@ -171,7 +178,9 @@ bool parse_config(int argc, char *argv[]) {
         }
     }
 
-    if (load_config_from_json(jsonconfig.file, &options, jsonconfig.function) == 0) {
+    if (jsonconfig.is_used == false) {
+        LOG__DEBUG("No configuration file is used");
+    } else if (load_config_from_json(jsonconfig.file, &options, jsonconfig.function) == 0) {
         if (strlen(options.logfile) == 0) {
             fprintf(stderr, "%s: No log file configured\n", progname);
         }
@@ -318,9 +327,10 @@ void print_usage() {
             "  --baudrate    Serial MAVLink baudrate (%d by default)\n"
             "  --server      Server address (%s by default)\n"
             "  --port        Server port (%d by default)\n"
+            "  --console     ????????\n"
             "  --loglevel    Setting the log level (%s by default)\n"
             "  --daemon      Runs the program in the background and detaches it from the input shell\n"
-            "  --function    Program function (client, server, direct). Is actually controlled via the program name (mavrptclient, mavrptserver, mavrpt)\n"
+            "  --function    Program function (client, server, direct or console). Is actually controlled via the program name (mavrptclient, mavrptserver, mavrpt or mavconsole)\n"
             "  --help        Display this help\n"
             , progname, options.device_dflt, options.baudrate_dflt, options.server, options.port, options.loglevel_dflt );
 
@@ -334,7 +344,8 @@ void print_usage() {
             "\n  Program name or function name:"
             "  mavrptclient - MAVLink repeater Client routes the data from the Air Station through the existing IP tunnel to the Ground Station server.\n"
             "  mavrptserver - MAVLink repeater Server handles the connection from the IP tunnel of the air station/clients and establishes a connection to a ground station software.\n"
-            "  mavrpt       - MAVLink repeater forwards directly from the air station to the ground station. Similar to MAVProxy.\n");
+            "  mavrpt       - MAVLink repeater forwards directly from the air station to the ground station. Similar to MAVProxy.\n"
+            "  mavconsole   - kommt noch\n");
     
     exit(EXIT_FAILURE);
 }
