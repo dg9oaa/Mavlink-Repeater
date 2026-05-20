@@ -62,6 +62,7 @@ extern "C" {
         char* mav_repeater_client;
         char* mav_repeater_server;
         char* mav_repeater;
+        char* mav_console;
     } prognames_t;
 
     typedef enum {

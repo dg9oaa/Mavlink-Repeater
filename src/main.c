@@ -84,9 +84,11 @@ void initialize() {
 */
 
     jsonconfig.defaultfile = JSON_CONFIG_FILE;
+    jsonconfig.is_used = true;
     prognames.mav_repeater = "mavrpt";    // MAVLink repeater forwards directly from the air station to the ground station
     prognames.mav_repeater_client = "mavrptclient";    // MAVLink repeater Client routes the data from the Air Station through the existing IP tunnel to the Ground Station server
     prognames.mav_repeater_server = "mavrptserver";    // MAVLink repeater Server handles the connection from the IP tunnel of the air station/clients and establishes a connection to a ground station software
+    prognames.mav_console = "mavconsole";
 
     strncpy(options.device_dflt, SERIAL_DEVICE, sizeof options.device_dflt);
     options.baudrate_dflt = SERIAL_DEVICE_BAUDRATE;
@@ -150,10 +152,10 @@ int main(int argc, char *argv[]) {
 
     parse_options(argc, argv);
 
-    LOG__DEBUG("Teste Logging %s", options.loglevel);
-    LOG__INFO("Teste Logging %s", options.loglevel);
-    LOG__WARN("Teste Logging %s", options.loglevel);
-    LOG__ERROR("Teste Logging %s", options.loglevel);
+    //LOG__DEBUG("Teste Logging %s", options.loglevel);
+    //LOG__INFO("Teste Logging %s", options.loglevel);
+    //LOG__WARN("Teste Logging %s", options.loglevel);
+    //LOG__ERROR("Teste Logging %s", options.loglevel);
 
     
     if (options.daemon) {
