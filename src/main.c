@@ -44,6 +44,7 @@
 #include "option.h"
 #include "common/mavlink.h"
 #include "logging.h"
+#include "console.h"
 
 #define JSON_CONFIG_FILE "/etc/mavlink-repeater.json"
 #define PID_FILE "/tmp/mavrpts.pid"
@@ -198,6 +199,8 @@ int main(int argc, char *argv[]) {
         LOG__DEBUG("process continues direct, no daemon");
     }
 
+    // ab hier test
+    
     if (options.daemon) sleep(10);
 
     int serial_fd = openSerial(options.device, options.baudrate);
