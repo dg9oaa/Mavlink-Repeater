@@ -17,7 +17,7 @@
 /* MAVLink erlaubt maximal 16 Zeichen + '\0' */
 #define PARAM_NAME_LEN   17
 /* ArduPilot hat typisch 500–800 Parameter */
-#define PARAM_MAX_COUNT  1024
+#define PARAM_MAX_COUNT  1500
 
 typedef struct {
     char     name[PARAM_NAME_LEN];  /* Parametername (null-terminiert)   */

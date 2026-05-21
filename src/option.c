@@ -86,7 +86,7 @@ void parse_options(int argc, char *argv[]) {
     optind = 1;
 
     while ((opt = getopt_long_only(argc, argv, "", cmd_options, &long_index)) != -1) {
-        printf("opt2 %c %d\n", opt, shift);
+        //printf("opt2 %c %d\n", opt, shift);
         switch (opt) {
             case 'h':
                 print_usage();
@@ -125,7 +125,6 @@ void parse_options(int argc, char *argv[]) {
 
             case 'T':
                 options.console = true;
-                printf("options.console\n");
                 break;
 
             case 'c':
@@ -144,8 +143,6 @@ void parse_options(int argc, char *argv[]) {
     if (strlen(options.device) == 0)
         strcpy(options.device, options.device_dflt);
 
-    //printUsage();
-    printf("options.console=%d\n", options.console);
 }
 
 /**
@@ -160,7 +157,7 @@ bool parse_config(int argc, char *argv[]) {
     int json_index = 0;
 
     while ((opt = getopt_long_only(argc, argv, "", cmd_options, &json_index)) != -1) {
-        printf("opt1 %c\n", opt);
+        //printf("opt1 %c\n", opt);
         switch (opt) {
             case 'h':
                 print_usage();

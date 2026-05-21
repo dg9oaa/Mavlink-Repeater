@@ -225,9 +225,7 @@ int main(int argc, char *argv[]) {
         printf("  logfilesize: %d\n",  options.logfilesize);
 
         if (strlen(options.logfile) > 0) {
-            int logsize = options.logfilesize > 0
-                          ? options.logfilesize
-                          : LOGFILE_DEFAULT_SIZE;
+            int logsize = options.logfilesize > 0 ? options.logfilesize : LOGFILE_DEFAULT_SIZE;
             log_set_file(options.logfile, logsize);
         } else {
             logSTD();
@@ -242,6 +240,13 @@ int main(int argc, char *argv[]) {
     }
 
     parse_options(argc, argv);
+    if (options.console) {
+        int logsize = options.logfilesize > 0 ? options.logfilesize : LOGFILE_DEFAULT_SIZE;
+        if (strlen(options.logfile) > 0)
+            log_set_file(options.logfile, logsize);
+        else
+            log_set_file(LOGFILE_DEFAULT_NAME, logsize);
+    }
 
     /* Daemon-Fork */
     if (options.daemon) {

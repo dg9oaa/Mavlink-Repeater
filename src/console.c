@@ -158,12 +158,12 @@ static void cmd_help(void) {
 
 static const char *param_type_name(uint8_t type) {
     switch (type) {
-        case 1:  return "UINT8";
-        case 2:  return "INT8";
-        case 3:  return "UINT16";
-        case 4:  return "INT16";
-        case 5:  return "UINT32";
-        case 6:  return "INT32";
+        case 1:  return "uint8";
+        case 2:  return "int8";
+        case 3:  return "uint16";
+        case 4:  return "int16";
+        case 5:  return "uint32";
+        case 6:  return "int32";
         case 9:  return "REAL32";
         case 10: return "REAL64";
         default: return "?";
@@ -216,8 +216,8 @@ static void cmd_list(param_cache_t *cache, const char *filter) {
                 "Parameter", "Wert",
                 "--------------------", "----------------");
         for (int i = 0; i < n; i++) {
-            printf("  %-20s  %16.6g  %-3d  %5d\n",
-                    buf[i].name, buf[i].value, buf[i].type, buf[i].index);
+            printf("  %-20s  %16.6g  %-6s  %5d\n",
+                    buf[i].name, buf[i].value, param_type_name(buf[i].type), buf[i].index);
         }
         printf(C_BOLD "\n  %d Parameter%s\n\n" C_RESET,
                 n, filter ? " (gefiltert)" : " gesamt");
@@ -228,9 +228,7 @@ static void cmd_list(param_cache_t *cache, const char *filter) {
 static void cmd_get(param_cache_t *cache, const char *name) {
     param_entry_t e;
     if (param_cache_find(cache, name, &e)) {
-        printf("\n  " C_CYAN "%-20s" C_RESET " = "
-                C_GREEN "%-16.6g" C_RESET
-                "  Typ %-6s  Index %d\n\n",
+        printf("\n  " C_CYAN "%-20s" C_RESET " = " C_GREEN "%-16.6g" C_RESET "  Typ %-6s  Index %d\n\n",
                 e.name, e.value, param_type_name(e.type), e.index);
     } else {
         printf(C_RED "\n  Parameter '%s' nicht im Cache.\n" C_RESET, name);
