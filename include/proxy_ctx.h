@@ -11,13 +11,15 @@
 #define PROXY_CTX_H
 
 #include <stdint.h>
+#include <signal.h>
 #include "param_cache.h"
 
 typedef struct {
-    int             serial_fd;  /* Serieller File-Deskriptor (USB → FC)  */
-    int             udp_fd;     /* UDP-Socket (Netzwerk → GCS)           */
-    param_cache_t  *cache;      /* MAVLink-Parameter-Cache               */
-    volatile int    running;    /* 0 → alle Threads sauber beenden       */
+    int                     serial_fd;   /* Serieller File-Deskriptor (USB → FC)   */
+    int                     udp_fd;      /* UDP-Socket (Netzwerk → GCS)            */
+    param_cache_t          *cache;       /* MAVLink-Parameter-Cache (thread-safe)  */
+    volatile sig_atomic_t  *stop;        /* Zeigt auf globales stop_requested      */
 } proxy_ctx_t;
+
 
 #endif /* PROXY_CTX_H */

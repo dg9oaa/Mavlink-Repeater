@@ -44,11 +44,12 @@ extern "C" {
         int  logfilesize;
         char device[32];
         char device_dflt[32];
-        int baudrate;
-        int baudrate_dflt;
+        int  baudrate;
+        int  baudrate_dflt;
         char server[32];
-        int port;
+        int  port;
         char function[32];
+        bool console;
     } options_t;
 
     typedef struct __jsonconfig_t {

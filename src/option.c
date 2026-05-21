@@ -45,6 +45,7 @@ extern options_t options;
 extern jsonconfig_t jsonconfig;
 extern prognames_t prognames;
 char *progname;
+int  shift = 1;
 
 
 #define FILESEPERATOR '/'
@@ -54,6 +55,7 @@ static struct option cmd_options[] = {
     {"help",      no_argument,       0, 'h'},
     {"daemon",    no_argument,       0, 'D'},
     {"loglevel",  required_argument, 0, 'L'},
+    {"console",   no_argument,       0, 'T'},
 
     {"device",    required_argument, 0, 'd'},
     {"baudrate",  required_argument, 0, 'b'},
@@ -67,20 +69,24 @@ static struct option cmd_options[] = {
     {0, 0, 0, 0}
 };
 
-/*
-static struct option json_options[] = {
-    {"help",      no_argument,       0, 'h'},
-    {"config",    required_argument, 0, 'c'},
-    {"function",  required_argument, 0, 'f'},
-    {0, 0, 0, 0}
-};
-*/
 
 void parse_options(int argc, char *argv[]) {
+    if (argc > 0) {
+        char buf[512] = {0};
+        int pos = 0;
+        for (int i = 1; i < argc && pos < (int) sizeof (buf) - 1; i++) {
+            pos += snprintf(buf + pos, sizeof (buf) - pos,
+                    "%s%s", i > 1 ? " " : "", argv[i]);
+        }
+        LOG__DEBUG("parse_options: %s", buf);
+    }
+
     int opt = 0;
     int long_index = 0;
+    optind = 1;
 
     while ((opt = getopt_long_only(argc, argv, "", cmd_options, &long_index)) != -1) {
+        printf("opt2 %c %d\n", opt, shift);
         switch (opt) {
             case 'h':
                 print_usage();
@@ -114,6 +120,18 @@ void parse_options(int argc, char *argv[]) {
                 break;
 
             case 'p':
+                options.port = atoi(optarg);
+                break;
+
+            case 'T':
+                options.console = true;
+                printf("options.console\n");
+                break;
+
+            case 'c':
+            case 'n':
+            case 'f':
+                // do nothing
                 break;
 
             default:
@@ -127,6 +145,7 @@ void parse_options(int argc, char *argv[]) {
         strcpy(options.device, options.device_dflt);
 
     //printUsage();
+    printf("options.console=%d\n", options.console);
 }
 
 /**
@@ -141,6 +160,7 @@ bool parse_config(int argc, char *argv[]) {
     int json_index = 0;
 
     while ((opt = getopt_long_only(argc, argv, "", cmd_options, &json_index)) != -1) {
+        printf("opt1 %c\n", opt);
         switch (opt) {
             case 'h':
                 print_usage();
@@ -148,15 +168,18 @@ bool parse_config(int argc, char *argv[]) {
 
             case 'c':
                 jsonconfig.file = optarg;
+                shift++;
                 break;
 
             case 'n':
                 jsonconfig.file = NULL;
                 jsonconfig.is_used = false;
+                shift++;
                 break;
                 
             case 'f':
                 jsonconfig.function = optarg;
+                shift++;
                 break;
         }
     }
@@ -165,9 +188,9 @@ bool parse_config(int argc, char *argv[]) {
         jsonconfig.file = jsonconfig.defaultfile;
     }
 
-    LOG__DEBUG("default json file:%s   file given:%s   function:%s\n", jsonconfig.defaultfile, jsonconfig.file, jsonconfig.function);
+    LOG__DEBUG("default json file:%s   file given:%s   function:%s   noconfig:%d\n", jsonconfig.defaultfile, jsonconfig.file, jsonconfig.function, jsonconfig.is_used);
 
-    if (jsonconfig.function == NULL) {
+    if (jsonconfig.function == NULL && jsonconfig.is_used) {
         if ((strcmp(prognames.mav_repeater, progname) == 0) || (strcmp(prognames.mav_repeater_client, progname) == 0) ||
                 (strcmp(prognames.mav_repeater_server, progname) == 0) || (strcmp(prognames.mav_console, progname) == 0)) {
             LOG__DEBUG("search %s in json config", progname);
@@ -318,16 +341,15 @@ void get_program_name(char *argv[]) {
 }
 
 void print_usage() {
-    printf("Usage: \n");
-
     printf(
+            "\n"
             "Usage: %s [OPTIONS]\n"
             "\n"
             "  --device      Serial MAVLink device (%s by default)\n"
             "  --baudrate    Serial MAVLink baudrate (%d by default)\n"
             "  --server      Server address (%s by default)\n"
             "  --port        Server port (%d by default)\n"
-            "  --console     ????????\n"
+            "  --console     Use MAVLink Console\n"
             "  --loglevel    Setting the log level (%s by default)\n"
             "  --daemon      Runs the program in the background and detaches it from the input shell\n"
             "  --function    Program function (client, server, direct or console). Is actually controlled via the program name (mavrptclient, mavrptserver, mavrpt or mavconsole)\n"
@@ -345,7 +367,7 @@ void print_usage() {
             "  mavrptclient - MAVLink repeater Client routes the data from the Air Station through the existing IP tunnel to the Ground Station server.\n"
             "  mavrptserver - MAVLink repeater Server handles the connection from the IP tunnel of the air station/clients and establishes a connection to a ground station software.\n"
             "  mavrpt       - MAVLink repeater forwards directly from the air station to the ground station. Similar to MAVProxy.\n"
-            "  mavconsole   - kommt noch\n");
+            "  mavconsole   - MAVLink console  allows to read and change configuration parameters\n");
     
     exit(EXIT_FAILURE);
 }
